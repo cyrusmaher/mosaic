@@ -94,7 +94,7 @@ cutoffs_bit = {'Pan': 500,
     }
 
 
-specorder=['Hom', 'Pan', 'Gor',
+specorder = ['Hom', 'Pan', 'Gor',
            'Pon', 'Mac', 'Cal',
            'Oto', 'Fel', 'Bos',
            'Equ']
