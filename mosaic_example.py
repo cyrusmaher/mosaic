@@ -1,163 +1,186 @@
-import sys, re
-from commands import getoutput, getstatusoutput
+import sys
+import re
+from commands import getoutput
 from Bio import AlignIO
 from mosaic import *
+import pandas as pd
 
-############################## begin functions/data for testing only
 
 def specfunc(name):
-	specieslist_ca = [
-		['(CCDS|hg19|Homo_sapiens)','Hom'],
-		['(ENSPTR|Pan|Pan_troglodytes)','Pan'],
-		['(ENSGGO|Gor|Gorilla_gorilla)','Gor'],
-		['(ENSPPY|Pon|Pongo_abelii)','Pon'],
-		['(ENSMMU|Mac|rheMac|Macaca_mulatta)','Mac'],
-		['(ENSCJA|Cal|Callithrix_jacchus)','Cal'],
-		['(ENSOGA|Oto|Otolemur_garnettii)','Oto'],
-		['(ENSFCA|Fel|Felis_catus)','Fel'],
-		['(ENSBTA|Bos|BOVIN|Bos_taurus)','Bos'],
-		['(ENSECA|Equ|HORSE|Equus_caballus)','Equ']
-	]
-	for xx in specieslist_ca:
-		if re.search(xx[0], name, re.IGNORECASE):
-			return xx[1]
-	return 'Unknown'
+    specieslist_ca = [
+        ['(CCDS|hg19|Homo_sapiens)', 'Hom'],
+        ['(ENSPTR|Pan|Pan_troglodytes)', 'Pan'],
+        ['(ENSGGO|Gor|Gorilla_gorilla)', 'Gor'],
+        ['(ENSPPY|Pon|Pongo_abelii)', 'Pon'],
+        ['(ENSMMU|Mac|rheMac|Macaca_mulatta)', 'Mac'],
+        ['(ENSCJA|Cal|Callithrix_jacchus)', 'Cal'],
+        ['(ENSOGA|Oto|Otolemur_garnettii)', 'Oto'],
+        ['(ENSFCA|Fel|Felis_catus)', 'Fel'],
+        ['(ENSBTA|Bos|BOVIN|Bos_taurus)', 'Bos'],
+        ['(ENSECA|Equ|HORSE|Equus_caballus)', 'Equ']
+    ]
+    for xx in specieslist_ca:
+        if re.search(xx[0], name, re.IGNORECASE):
+            return xx[1]
+    return 'Unknown'
+
 
 def specfunc2(name):
-	# Same as above, but it could be different!
-	specieslist_ca = [
-		['(CCDS|hg19|Homo_sapiens)','Hom'],
-		['(ENSPTR|Pan|Pan_troglodytes)','Pan'],
-		['(ENSGGO|Gor|Gorilla_gorilla)','Gor'],
-		['(ENSPPY|Pon|Pongo_abelii)','Pon'],
-		['(ENSMMU|Mac|rheMac|Macaca_mulatta)','Mac'],
-		['(ENSCJA|Cal|Callithrix_jacchus)','Cal'],
-		['(ENSOGA|Oto|Otolemur_garnettii)','Oto'],
-		['(ENSFCA|Fel|Felis_catus)','Fel'],
-		['(ENSBTA|Bos|BOVIN|Bos_taurus)','Bos'],
-		['(ENSECA|Equ|HORSE|Equus_caballus)','Equ']
-	]
-	for xx in specieslist_ca:
-		if re.search(xx[0], name, re.IGNORECASE):
-			return xx[1]
-	return 'Unknown'
+    # Same as above, but it could be different!
+    specieslist_ca = [
+        ['(CCDS|hg19|Homo_sapiens)', 'Hom'],
+        ['(ENSPTR|Pan|Pan_troglodytes)', 'Pan'],
+        ['(ENSGGO|Gor|Gorilla_gorilla)', 'Gor'],
+        ['(ENSPPY|Pon|Pongo_abelii)', 'Pon'],
+        ['(ENSMMU|Mac|rheMac|Macaca_mulatta)', 'Mac'],
+        ['(ENSCJA|Cal|Callithrix_jacchus)', 'Cal'],
+        ['(ENSOGA|Oto|Otolemur_garnettii)', 'Oto'],
+        ['(ENSFCA|Fel|Felis_catus)', 'Fel'],
+        ['(ENSBTA|Bos|BOVIN|Bos_taurus)', 'Bos'],
+        ['(ENSECA|Equ|HORSE|Equus_caballus)', 'Equ']
+    ]
+    for xx in specieslist_ca:
+        if re.search(xx[0], name, re.IGNORECASE):
+            return xx[1]
+    return 'Unknown'
+
 
 def getMSAlist_for_me(testfile, methodnames):
-	MSAset1=[]
-	MSAset2=[]
-	methods=[]
-	for tt in ['AA', 'DNA']:
-		for xx in methodnames:
-			print xx
-			fname1 = getoutput('find ../aligned%s_%s -name "%s"'%(tt, xx, testfile))
-			print "In getMSAset_for_me, found", fname1
-			if 'aligned' not in fname1:
-				continue
+    MSAset1 = []
+    MSAset2 = []
+    methods = []
+    for tt in ['AA', 'DNA']:
+        for xx in methodnames:
+            print xx
+            fname1 = getoutput('find ../aligned%s_%s -name "%s"'
+                               % (tt, xx, testfile))
+            print "In getMSAset_for_me, found", fname1
+            if 'aligned' not in fname1:
+                continue
 
-			fname1 = fname1.split('\n')[0]
-			print tt, xx, fname1
-			with open(fname1) as fopen:
-				MSA=AlignIO.read(fopen, 'fasta')
-				if tt == 'AA':
-					MSAset1.append(MSA)
-					methods.append(xx)
-				else:
-					MSAset2.append(MSA)
+            fname1 = fname1.split('\n')[0]
+            print tt, xx, fname1
+            with open(fname1) as fopen:
+                MSA = AlignIO.read(fopen, 'fasta')
+                if tt == 'AA':
+                    MSAset1.append(MSA)
+                    methods.append(xx)
+                else:
+                    MSAset2.append(MSA)
 
-	return MSAset1, MSAset2, methods
+    return MSAset1, MSAset2, methods
 
 
-cutoffs_perID={'Pan':.8247692861,
-					'Gor': .7730707713,
-					'Pon': .7627883286,
-					'Mac': .7527148696,
-					'Cal': .7396314922,
-					'Oto': .7039398156,
-					'Fel': .70,
-					'Bos': .70,
-					'Equ': .70
-	}
+cutoffs_perID = {'Pan': .8247692861,
+                    'Gor': .7730707713,
+                    'Pon': .7627883286,
+                    'Mac': .7527148696,
+                    'Cal': .7396314922,
+                    'Oto': .7039398156,
+                    'Fel': .70,
+                    'Bos': .70,
+                    'Equ': .70
+    }
 
-cutoffs_bit={'Pan':500,
-					'Gor': 500,
-					'Pon': 500,
-					'Mac': 500,
-					'Cal': 500,
-					'Oto': 500,
-					'Fel': 500,
-					'Bos': 500,
-					'Equ': 500
-	}
-import pandas as pd
-specorder=['Hom', 'Pan', 'Gor', 'Pon', 'Mac', 'Cal', 'Oto', 'Fel', 'Bos', 'Equ']
+cutoffs_bit = {'Pan': 500,
+                    'Gor': 500,
+                    'Pon': 500,
+                    'Mac': 500,
+                    'Cal': 500,
+                    'Oto': 500,
+                    'Fel': 500,
+                    'Bos': 500,
+                    'Equ': 500
+    }
+
+
+specorder=['Hom', 'Pan', 'Gor',
+           'Pon', 'Mac', 'Cal',
+           'Oto', 'Fel', 'Bos',
+           'Equ']
 percutoffs_mat = pd.DataFrame(.8, index=specorder, columns=specorder)
-# End testing functions/data
 
+if __name__ == '__main__':
+    with open(sys.argv[1]) as f1:  # read filename off of the commandline
+        testfile_list = [xx.strip() for xx in f1.readlines() if xx.strip()]
 
-if __name__=='__main__':
-	with open(sys.argv[1]) as f1: # read filename off of the commandline
-		testfile_list=[xx.strip() for xx in f1.readlines() if xx.strip()]
+    specnames = ['Hom', 'Pan', 'Gor',
+                 'Pon', 'Mac', 'Cal',
+                 'Oto', 'Fel', 'Bos',
+                 'Equ']
+    methodnames = ['inpara', 'blat', 'multiz', 'OMA']
 
-	specnames=['Hom', 'Pan', 'Gor', 'Pon', 'Mac', 'Cal', 'Oto', 'Fel', 'Bos', 'Equ']
-	methodnames = ['inpara', 'blat', 'multiz', 'OMA']
+    for optrule in ['pairwise', 'toref']:
+        for edgefunc in ['perID', 'bitscore']:
 
+            cutoffs = cutoffs_perID if edgefunc == 'perID' else cutoffs_bit
 
-	for optrule in ['pairwise', 'toref']:
-		for edgefunc in ['perID', 'bitscore']:
+            for testfile in testfile_list:
+                print '*********** Starting %s *******************' % testfile
+                print "reading in first MSA set"
+                MSAsetAA1, MSAsetDNA1, methods1 = \
+                    getMSAlist_for_me(testfile, methodnames[:2])
 
-			cutoffs = cutoffs_perID if edgefunc=='perID' else cutoffs_bit
+                print MSAsetAA1, methods1
 
-			for testfile in testfile_list:
-				print '*********** Starting %s *******************' %testfile
-				print "reading in first MSA set"
-				MSAsetAA1, MSAsetDNA1, methods1 = getMSAlist_for_me(testfile, methodnames[:2])
-				print MSAsetAA1, methods1
+                print "reading in second MSA set"
+                MSAsetAA2, MSAsetDNA2, methods2 = \
+                    getMSAlist_for_me(testfile, methodnames[2:])
 
-				print "reading in second MSA set"
-				MSAsetAA2, MSAsetDNA2, methods2 = getMSAlist_for_me(testfile, methodnames[2:])
-				print MSAsetAA2, methods1
+                print MSAsetAA2, methods1
 
-				print "making first multiMSA"
-				multiMSA = MultiMSA(MSAsetAA1, MSAsetDNA1, specfunc1=specfunc, methodnames1=methods1, methodnames2=methods1)
-				print "making second multiMSA"
-				multiMSA2 = MultiMSA(MSAsetAA2, MSAsetDNA2, specfunc1=specfunc2, methodnames1=methods2, methodnames2=methods2)
+                print "making first multiMSA"
+                multiMSA = MultiMSA(MSAsetAA1, MSAsetDNA1,
+                                    specfunc1=specfunc,
+                                    methodnames1=methods1,
+                                    methodnames2=methods1)
+                print "making second multiMSA"
+                multiMSA2 = MultiMSA(MSAsetAA2, MSAsetDNA2,
+                                     specfunc1=specfunc2,
+                                     methodnames1=methods2,
+                                     methodnames2=methods2)
 
-				print "Catenating multiMSAs"
-				multiMSA_final = multiMSA + multiMSA2
-				print multiMSA_final
+                print "Catenating multiMSAs"
+                multiMSA_final = multiMSA + multiMSA2
+                print multiMSA_final
 
-				print "Running MOSAIC"
-				mosaic = Mosaic(multiMSA, optrule=optrule, ref='Hom', ignoregaps=True, edgefunc=edgefunc, speccutoffs=cutoffs)
+                print "Running MOSAIC"
+                mosaic = Mosaic(multiMSA, optrule=optrule, ref='Hom',
+                                ignoregaps=True,
+                                edgefunc=edgefunc,
+                                speccutoffs=cutoffs)
 
+                dirname1 = '../unalignedAA_MOSAIC_%s_%s' % (optrule, edgefunc)
+                dirname2 = dirname1.replace('AA', 'DNA')
 
+                if not os.path.exists(dirname1):
+                    os.mkdir(dirname1)
+                if not os.path.exists(dirname2):
+                    os.mkdir(dirname2)
 
-				dirname1 = '../unalignedAA_MOSAIC_%s_%s' %(optrule, edgefunc)
-				dirname2 = dirname1.replace('AA', 'DNA')
+                filename1 = '%s/%s' % (dirname1, testfile)
+                filename2 = '%s/%s' % (dirname2, testfile)
 
-				if not os.path.exists(dirname1): os.mkdir(dirname1)
-				if not os.path.exists(dirname2): os.mkdir(dirname2)
+                print "Writing unaligned files"
+                mosaic.write_unaligned(filename1=filename1,
+                                       filename2=filename2,
+                             inclspec=True, inclmet=True,
+                             specorder=['Hom', 'Pan', 'Gor',
+                                        'Pon', 'Mac', 'Cal',
+                                        'Oto', 'Fel', 'Bos',
+                                        'Equ']
+                                        )
 
-				filename1='%s/%s' %(dirname1, testfile)
-				filename2='%s/%s' %(dirname2, testfile)
+                dirname1_aligned = dirname1.replace('unaligned', 'aligned')
+                dirname2_aligned = dirname2.replace('unaligned', 'aligned')
 
+                if not os.path.exists(dirname1_aligned):
+                    os.mkdir(dirname1_aligned)
+                if not os.path.exists(dirname2_aligned):
+                    os.mkdir(dirname2_aligned)
 
+                filename1_aligned = filename1.replace('unaligned', 'aligned')
+                filename2_aligned = filename2.replace('unaligned', 'aligned')
 
-				print "Writing unaligned files"
-				mosaic.write_unaligned(filename1=filename1, filename2=filename2,
-				             inclspec=True, inclmet=True,
-				             specorder=['Hom', 'Pan', 'Gor', 'Pon', 'Mac', 'Cal', 'Oto', 'Fel', 'Bos', 'Equ']
-							)
-
-
-				dirname1_aligned = dirname1.replace('unaligned', 'aligned')
-				dirname2_aligned = dirname2.replace('unaligned', 'aligned')
-
-				if not os.path.exists(dirname1_aligned): os.mkdir(dirname1_aligned)
-				if not os.path.exists(dirname2_aligned): os.mkdir(dirname2_aligned)
-
-				filename1_aligned = filename1.replace('unaligned', 'aligned')
-				filename2_aligned = filename2.replace('unaligned', 'aligned')
-
-
-				print "Aligning sequences"
-				mosaic.align(filename1_aligned, filename2=filename2_aligned)
+                print "Aligning sequences"
+                mosaic.align(filename1_aligned, filename2=filename2_aligned)
