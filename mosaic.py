@@ -74,7 +74,7 @@ def pairwisealign(seq1, seq2, **kwargs):
         print output
         print "There was an error in pairwisealign.\
                 Is stretcher installed? See above output and check out", \
-                outfile.name
+            outfile.name
         print callstr
         outfile.close()
         raise SystemError
@@ -112,14 +112,14 @@ class MultiMSA:
     def __init__(self, MSAlist1, MSAlist2=None, MSAspec1=None, MSAspec2=None,
                  specfunc1=None, specfunc2=None, methodnames1=None,
                  methodnames2=None, specorder=None):
-
+        assert MSAlist1, 'MSAlist1 is empty!!'
         assert MSAspec1 or specfunc1, \
             'Mosaic needs to know the order of species in MSA 1.' \
             'Please either supply a ordered list of species\
             or a function to obtain this information from record labels.'
 
         if MSAspec2:
-            assert MSAspec2 or specfunc2 or specfunc1,\
+            assert MSAspec2 or specfunc2 or specfunc1, \
                 'Mosaic needs to know the order of species in the MSA 2.' \
                 'Please either supply a ordered list of species\
                 or a function to obtain this information from record labels.'
@@ -135,9 +135,9 @@ class MultiMSA:
 
         self.methodnames2 = ['Met%s' % xx
                              for xx in range(1, len(MSAlist2) + 1)] \
-                                if ((methodnames2 is None)
-                                        and (MSAlist2 is not None)) \
-                                else methodnames2
+            if ((methodnames2 is None)
+                and (MSAlist2 is not None)) \
+            else methodnames2
 
         self.nummethods = len(self.methodnames1)
         self.specorder = specorder
@@ -176,10 +176,11 @@ class MultiMSA:
 
     def storeMSAdicts(self):
         self.MSAdict1 = self._storeMSAdict(self.methodnames1,
-                                        self.MSAlist1_specs, self.MSAlist1)
+                                           self.MSAlist1_specs, self.MSAlist1)
         if self.MSAlist2:
             self.MSAdict2 = self._storeMSAdict(self.methodnames2,
-                                        self.MSAlist2_specs, self.MSAlist2)
+                                               self.MSAlist2_specs,
+                                               self.MSAlist2)
         else:
             self.MSAdict2 = {}
 
@@ -188,14 +189,14 @@ class MultiMSA:
             specs = thedict[xx].keys()
             specs.sort()
             startstr += '\tFor %s, alignments of length %s returned for %s\n'\
-                            % (xx, len(thedict[xx][specs[0]]), specs)
+                        % (xx, len(thedict[xx][specs[0]]), specs)
         return startstr
 
     def __repr__(self):
         str1 = self._strn(self.MSAdict1, startstr='Set 1:\n') if self.MSAdict1\
             else 'ERROR! No alignments included for set 1.'
         if self.MSAlist2:
-            str2 = self._strn(self.MSAdict2, startstr='Set 2:\n')\
+            str2 = self._strn(self.MSAdict2, startstr='Set 2:\n') \
                 if self.MSAdict2 \
                 else 'No alignments included for set 2.'
 
@@ -204,12 +205,13 @@ class MultiMSA:
 
     def __add__(self, other):
         for xx in other.methodnames1:
-            assert xx not in self.methodnames1,\
-                'ERROR: Catenated multiMSAs'\
+            assert xx not in self.methodnames1, \
+                'ERROR: Catenated multiMSAs' \
                 'should not have overlapping method names!'
 
         self.MSAdict1.update(self._storeMSAdict(other.methodnames1,
-                                        other.MSAlist1_specs, other.MSAlist1))
+                                                other.MSAlist1_specs,
+                                                other.MSAlist1))
 
         self.methodnames1 = self.methodnames1 + other.methodnames1
 
@@ -217,7 +219,8 @@ class MultiMSA:
 
         if self.MSAlist2 and other.MSAlist2:
             self.MSAdict2.update(self._storeMSAdict(other.methodnames2,
-                                        other.MSAlist2_specs, other.MSAlist2))
+                                                    other.MSAlist2_specs,
+                                                    other.MSAlist2))
 
             self.methodnames2 = self.methodnames2 + other.methodnames2
             self.MSAlist2_specs = self.MSAlist2_specs + other.MSAlist2_specs
@@ -264,10 +267,10 @@ class Mosaic:
     """
 
     def __init__(self, multiMSA, ref, useonlyspec=None, speccutoffs=None,
-                edgefunc='perID', optrule='pairwise', ignoregaps=False,
-                customoptfunc=None, AA=True, scoremat=None,
-                stretcher_gapopen=8, stretcher_gapextend=1,
-                similaritythresh=-1e6):
+                 edgefunc='perID', optrule='pairwise', ignoregaps=False,
+                 customoptfunc=None, AA=True, scoremat=None,
+                 stretcher_gapopen=8, stretcher_gapextend=1,
+                 similaritythresh=-1e6):
 
         self.multiMSA = multiMSA
         self.speccutoffs = speccutoffs
@@ -307,22 +310,22 @@ class Mosaic:
                                             index_col=0, sep="\s+")
             elif AA:
                 self.scoremat = pd.read_csv(
-                                    os.path.join(os.path.dirname(__file__),
-                                    'BLOSUM62.txt'),
-                                    header=0, index_col=0, sep="\s+")
+                    os.path.join(os.path.dirname(__file__),
+                                 'BLOSUM62.txt'),
+                    header=0, index_col=0, sep="\s+")
             else:
                 self.scoremat = pd.read_csv(os.path.join(
-                                            os.path.dirname(__file__),
-                                            'EDNAFULL.txt'),
+                    os.path.dirname(__file__),
+                    'EDNAFULL.txt'),
                                             header=0, index_col=0, sep="\s+")
 
         elif hasattr(edgefunc, '__call__'):
             self.edgefunc = edgefunc
         else:
             raise AssertionError('Unrecognized value for edge function. '
-                     'You supplied %s' % edgefunc)
+                                 'You supplied %s' % edgefunc)
 
-        assert ref is not None,\
+        assert ref is not None, \
             "A reference species is required in order to anchor the cluster."
 
         if ignoregaps:
@@ -366,9 +369,9 @@ class Mosaic:
 
         """
         seq1_aligned, seq2_aligned = pairwisealign(seq1, seq2,
-                                            AA=self.AA,
-                                            gapopen=self.stretcher_gapopen,
-                                            gapextend=self.stretcher_gapextend)
+                                           AA=self.AA,
+                                           gapopen=self.stretcher_gapopen,
+                                           gapextend=self.stretcher_gapextend)
 
         score = 0
         for xx, yy in zip(seq1_aligned, seq2_aligned):
@@ -412,7 +415,7 @@ class Mosaic:
             seq2_notmissing = np.logical_and((seq2 != '?'), (seq2 != 'N'))
             if self.ignoregaps:
                 seq1_notmissing = np.logical_and((seq1 != '-'),
-                                                seq1_notmissing)
+                                                 seq1_notmissing)
 
         pairmatches = (seq1 == seq2)
 
@@ -495,15 +498,14 @@ class Mosaic:
                         seq_y = entry_y[s_y] if s_y in entry_y else None
 
                         if seq_x and seq_y:
-                            print "Calculating edge weights!", xcount, ycount,\
+                            print "Calculating edge weights:", \
                                 '(%s, %s vs. %s, %s)' % (m_x, s_x, m_y, s_y)
 
                             self.edgeweights_pairwise[xcount, ycount] = \
                                 self.edgefunc(seq_x.seq._data, seq_y.seq._data)
 
                             print "\tValue is", \
-                                self.edgeweights_pairwise[xcount, ycount],\
-                                "at %s, %s" % (xcount, ycount)
+                                self.edgeweights_pairwise[xcount, ycount]
 
                         ycount += 1
                 xcount += 1
@@ -545,8 +547,8 @@ class Mosaic:
                 seq_y = entry_y[s_y] if s_y in entry_y else None
 
                 if seq_x and seq_y:
-                    print "Calculating edge weights!", scount, mcount, \
-                            '(%s, %s vs. %s, %s)' % (met1, self.ref, m_y, s_y)
+                    print "Calculating edge weights:", scount, mcount, \
+                        '(%s, %s vs. %s, %s)' % (met1, self.ref, m_y, s_y)
 
                     score = self.edgefunc(seq_x.seq._data, seq_y.seq._data)
 
@@ -555,6 +557,9 @@ class Mosaic:
                         continue
 
                     self.edgeweights_toref[scount, mcount] = score
+
+                    print "\tValue is", \
+                        self.edgeweights_toref[scount, mcount]
 
         self.allspecs = [s_y for scount, s_y in enumerate(self.allspecs)
                          if s_y == self.ref or
@@ -584,7 +589,7 @@ class Mosaic:
                     (self.multiMSA.methodnames1[yindex],
                      cc,
                      yindex
-                     )
+                    )
             else:
                 retvals[self.allspecs[cc]] = None
         self.specmethoddict = retvals
@@ -596,7 +601,7 @@ class Mosaic:
         dd = self.edgeweights_toref[snum, mnum]
 
         if dd < self.thresh:
-            print 'Why is distance to reference unknown for %s, %s?'\
+            print 'Why is distance to reference unknown for %s, %s?' \
                   % (spec, method)
             raise IndexError
 
@@ -613,7 +618,7 @@ class Mosaic:
                 if dd < self.thresh:
                     print 'Why is distance to bestspec unknown?\
                         (Index is %s vs %s)' % (i2, index)
-                    print 'This corresponds to %s, %s vs %s, %s'\
+                    print 'This corresponds to %s, %s vs %s, %s' \
                           % (ss, self.specmethoddict[ss][0], spec, method)
                     print self.indextomet_spec(i2), self.indextomet_spec(index)
                     raise IndexError
@@ -667,15 +672,16 @@ class Mosaic:
                 for mcount in metnums:
                     mm = self.methods[mcount]
 
-        ## The second condition below skips methods that have been filtered
+                    ## The second condition below
+                    ## skips methods that have been filtered
                     if (mm != met_old and
                             (self.edgeweights_toref[scount, mcount]
-                             > self.thresh)):
+                                 > self.thresh)):
 
                         index = self.toindex(mcount, scount - 1)
 
                         if np.all(self.edgeweights_pairwise[:, index]
-                                  < self.thresh):
+                                < self.thresh):
                             continue
 
                         dist_new = self.gatherpairwisedifs(ss, mm, index)
@@ -726,9 +732,9 @@ class Mosaic:
             self.specmethoddict = self.customoptfunc()
         else:
             raise AssertionError(
-                    'Did not recognize cluster optimization rule: %s.'
-                    'Available options are: pairwise, toref, and custom.'
-                    % self.optrule)
+                'Did not recognize cluster optimization rule: %s.'
+                'Available options are: pairwise, toref, and custom.'
+                % self.optrule)
 
     def _writefunc(self, filename, MSAdict, toloop, labelfunc,
                    inclspec, inclmet):
@@ -804,15 +810,15 @@ class Mosaic:
         annotfile = '%s.annot' % f_out
 
         try:
-            print "Attempting to align using MSAProbsCommandline"
+            print "Attempting to align using MSAProbsCommandline."
             from Bio.Align.Applications import MSAProbsCommandline
+
             cline = MSAProbsCommandline(infile=f_in, outfile=f_out,
                                         annot=annotfile, **kwargs)
             cline()
         except ImportError as e1:
             print e1
-            print 'Aligning using MSAProbsCommandline failed.\
-            Trying another way...'
+            print "Trying another way..."
 
             callstr = 'msaprobs -annot %s -c %s -ir %s' % (annotfile, c, ir)
 
@@ -849,7 +855,7 @@ class Mosaic:
             `pal2nal <http://www.bork.embl.de/pal2nal/>`_.
         """
         callstr = 'perl pal2nal.pl %s %s -output fasta > %s' \
-                    % (f_AA_aligned, f_DNA_unaligned, f_DNA_out)
+                  % (f_AA_aligned, f_DNA_unaligned, f_DNA_out)
         s, o = getstatusoutput(callstr)
         if s != 0:
             print "Error in pal2nal"
