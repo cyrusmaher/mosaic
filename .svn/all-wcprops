@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 26
+/svn/!svn/ver/1/bio-mosaic
+END
+testfiles_short.txt
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/!svn/ver/1/bio-mosaic/testfiles_short.txt
+END
+testfiles.txt
+K 25
+svn:wc:ra_dav:version-url
+V 40
+/svn/!svn/ver/1/bio-mosaic/testfiles.txt
+END
+MOSAIC.py
+K 25
+svn:wc:ra_dav:version-url
+V 36
+/svn/!svn/ver/3/bio-mosaic/MOSAIC.py
+END
+OD_fullpaper_8_5_13.docx
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/!svn/ver/1/bio-mosaic/OD_fullpaper_8_5_13.docx
+END
+BLOSUM62.txt
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/svn/!svn/ver/1/bio-mosaic/BLOSUM62.txt
+END
+EDNAFULL.txt
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/svn/!svn/ver/1/bio-mosaic/EDNAFULL.txt
+END
+MOSAIC_example.py
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/svn/!svn/ver/2/bio-mosaic/MOSAIC_example.py
+END
